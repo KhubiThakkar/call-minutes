@@ -3,7 +3,6 @@ import { weekStartOf } from "@/lib/dates";
 import type {
   ActivityLogEntry,
   Call,
-  LedgerEntry,
   MoveRing,
   Profile,
   Punishment,
@@ -69,7 +68,6 @@ export interface DashboardData {
   todaysWorkouts: Workout[];
   badgesThisWeek: WeeklyBadge[];
   openPunishments: (Punishment & { calls: Pick<Call, "id" | "call_date"> })[];
-  recentLedger: LedgerEntry[];
 }
 
 export async function getDashboardData(): Promise<DashboardData> {
@@ -78,7 +76,7 @@ export async function getDashboardData(): Promise<DashboardData> {
   const [today, settings, balance] = await Promise.all([getToday(), getSettings(), getBalance()]);
   const weekStart = weekStartOf(today);
 
-  const [moveRingsRes, workoutsRes, badgesRes, punishmentsRes, ledgerRes] = await Promise.all([
+  const [moveRingsRes, workoutsRes, badgesRes, punishmentsRes] = await Promise.all([
     supabase
       .from("move_rings")
       .select("*")
@@ -92,18 +90,12 @@ export async function getDashboardData(): Promise<DashboardData> {
       .select("*, calls(id, call_date)")
       .eq("status", "open")
       .order("assigned_date", { ascending: true }),
-    supabase
-      .from("ledger_entries")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(15),
   ]);
 
   if (moveRingsRes.error) throw new Error(moveRingsRes.error.message);
   if (workoutsRes.error) throw new Error(workoutsRes.error.message);
   if (badgesRes.error) throw new Error(badgesRes.error.message);
   if (punishmentsRes.error) throw new Error(punishmentsRes.error.message);
-  if (ledgerRes.error) throw new Error(ledgerRes.error.message);
 
   return {
     viewer,
@@ -115,7 +107,6 @@ export async function getDashboardData(): Promise<DashboardData> {
     todaysWorkouts: workoutsRes.data,
     badgesThisWeek: badgesRes.data,
     openPunishments: punishmentsRes.data as unknown as DashboardData["openPunishments"],
-    recentLedger: ledgerRes.data,
   };
 }
 

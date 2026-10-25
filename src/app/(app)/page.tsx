@@ -3,7 +3,6 @@ import { BalanceCard } from "@/components/dashboard/balance-card";
 import { ChecklistCard } from "@/components/dashboard/checklist-card";
 import { WeekProgressCard } from "@/components/dashboard/week-progress-card";
 import { PunishmentsCard } from "@/components/dashboard/punishments-card";
-import { RecentLedgerCard } from "@/components/dashboard/recent-ledger-card";
 
 export default async function HomePage() {
   const data = await getDashboardData();
@@ -38,7 +37,6 @@ export default async function HomePage() {
         badgeBonus={data.settings.badge_bonus}
         backfillDays={data.settings.backfill_days}
       />
-      <RecentLedgerCard entries={data.recentLedger} profiles={data.viewer.profiles} />
     </div>
   );
 }
