@@ -58,7 +58,8 @@ export function ChecklistCard({
         {profiles.map((person) => {
           const ring = todaysMoveRings.find((r) => r.person_id === person.id);
           const workout = todaysWorkouts.find((w) => w.person_id === person.id);
-          const label = person.id === meId ? "You" : person.display_name;
+          const isSelf = person.id === meId;
+          const label = isSelf ? "You" : person.display_name;
 
           return (
             <div key={person.id} className="flex flex-col gap-2">
@@ -68,7 +69,7 @@ export function ChecklistCard({
                   <Checkbox
                     id={`ring-${person.id}`}
                     checked={!!ring?.ticked}
-                    disabled={pending}
+                    disabled={pending || !isSelf}
                     onCheckedChange={(checked) => handleToggleRing(person.id, checked === true)}
                   />
                   Move ring
@@ -79,7 +80,7 @@ export function ChecklistCard({
                 <span className="text-sm">Workout</span>
                 {workout ? (
                   <Badge variant="secondary">{workout.duration_minutes}m logged</Badge>
-                ) : (
+                ) : isSelf ? (
                   <div className="flex gap-2">
                     <Button size="sm" variant="outline" disabled={pending} onClick={() => handleLogWorkout(person.id, 30)}>
                       30m
@@ -88,6 +89,8 @@ export function ChecklistCard({
                       45m
                     </Button>
                   </div>
+                ) : (
+                  <span className="text-xs text-muted-foreground">Not logged</span>
                 )}
               </div>
             </div>

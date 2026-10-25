@@ -60,7 +60,8 @@ export function WeekProgressCard({
             moveRingsThisWeek.some((r) => r.person_id === person.id && r.day === day && r.ticked),
           ).length;
           const claimed = badgesThisWeek.some((b) => b.person_id === person.id && b.status === "claimed");
-          const label = person.id === meId ? "You" : person.display_name;
+          const isSelf = person.id === meId;
+          const label = isSelf ? "You" : person.display_name;
 
           return (
             <div key={person.id} className="flex flex-col gap-2">
@@ -85,10 +86,12 @@ export function WeekProgressCard({
               </div>
               {claimed ? (
                 <span className="text-xs text-muted-foreground">Badge claimed this week (+{badgeBonus} min)</span>
-              ) : tickedCount === 7 && claimWindowOpen ? (
+              ) : tickedCount === 7 && claimWindowOpen && isSelf ? (
                 <Button size="sm" variant="secondary" disabled={pending} onClick={() => handleClaim(person.id)}>
                   Claim 1-week badge (+{badgeBonus} min)
                 </Button>
+              ) : tickedCount === 7 && claimWindowOpen ? (
+                <span className="text-xs text-muted-foreground">Eligible — waiting on {label} to claim</span>
               ) : (
                 <span className="text-xs text-muted-foreground">{tickedCount}/7 days ticked</span>
               )}
